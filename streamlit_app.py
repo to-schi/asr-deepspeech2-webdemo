@@ -188,7 +188,7 @@ def main():
         record_save(RECORDED)
         if RECORDED.exists() == True:
             st.write("Recording found.")
-            predict_rec = st.button('Predict recording')
+            predict_rec = st.button('Transcribe recording')
             if predict_rec:
                 st. audio(display_audio(RECORDED), format='audio/wav')
                 st.write(f"**Prediction:  '{predict_file(RECORDED)}'**")
