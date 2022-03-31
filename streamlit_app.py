@@ -31,7 +31,7 @@ st.title('Speech Recognition Demo')
 st.markdown(
     """
 This demo app is using an simplified end-to-end speech recognition engine based on DeepSpeech2.
-It was trained on the LibriSpeech 100 hours dataset. The word-error-rate is currently at 19%.
+It was trained on the English LibriSpeech 100 hours dataset. The word-error-rate is currently at 19%.
 A good microphone is recommended.\n
 More information can be found [here](https://github.com/to-schi).
 """
