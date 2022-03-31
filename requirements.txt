@@ -1,0 +1,6 @@
+streamlit
+tensorflow==2.6.0
+tensorflow_io
+pydub
+numpy
+streamlit_webrtc
