@@ -184,7 +184,7 @@ def main():
         "Choose an option", ['Record speech', 'Open wav-file', 'Examples'])
 
     if page == 'Record speech':
-        st.header('Make a new recording')
+        st.header('Record speech')
         record_save(RECORDED)
         if RECORDED.exists() == True:
             st.write("Recording found.")
