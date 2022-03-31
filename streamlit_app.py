@@ -181,7 +181,7 @@ def main():
     # Download model-file if not existing and set session_state['model'] = True
     download_file(MODEL_URL, MODEL_LOCAL_PATH, expected_size=337431496)
     page = st.sidebar.selectbox(
-        "Choose an option", ['Record speech', 'Open wav-file', 'Examples'])
+        "Choose an option:", ['Record speech', 'Open wav-file', 'Examples'])
 
     if page == 'Record speech':
         st.header('Record speech')
