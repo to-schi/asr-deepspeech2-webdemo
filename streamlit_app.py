@@ -168,10 +168,6 @@ def record_save(FILENAME):
         st.session_state["audio_buffer"] = pydub.AudioSegment.empty()
 
 #### predict and display#################################################
-def predict_file(file):
-    prediction = ps.make_prediction(str(file))
-    return prediction
-    
 def display_audio(file):
     audio_file = open(str(file), 'rb')
     audio_bytes = audio_file.read()
@@ -180,6 +176,8 @@ def display_audio(file):
 def main():
     # Download model-file if not existing and set session_state['model'] = True
     download_file(MODEL_URL, MODEL_LOCAL_PATH, expected_size=337431496)
+    
+    # set 3 pages to select in sidebar:
     page = st.sidebar.selectbox(
         "Choose an option:", ['Record speech', 'Open wav-file', 'Examples'])
 
@@ -189,9 +187,10 @@ def main():
         if RECORDED.exists() == True:
             st.write("Recording found.")
             predict_rec = st.button('Transcribe recording')
+            prediction = ps.make_prediction(str(RECORDED))
             if predict_rec:
                 st. audio(display_audio(RECORDED), format='audio/wav')
-                st.write(f"**Prediction:  '{predict_file(RECORDED)}'**")
+                st.write(f"**Prediction:  '{prediction}'**")
                 st.download_button(
                     "Save recorded file", display_audio(RECORDED), 'audio')
 
@@ -206,7 +205,8 @@ def main():
                 f.write(bytes_data)
             # predict with PredictionService
             st.audio(display_audio(UPLOADED), format='audio/wav')
-            st.write(f"**Prediction:  '{predict_file(UPLOADED)}'**")
+            prediction = ps.make_prediction(str(UPLOADED))
+            st.write(f"**Prediction:  '{prediction}'**")
 
     else:
         # streamlit container-structure
@@ -232,11 +232,11 @@ def main():
         example3 = third.button("Transcribe", key=3)
 
         if example1:
-            first.write(f"**Prediction:  '{predict_file(EXAMPLE_1)}'**")
+            first.write(f"**Prediction:  '{ps.make_prediction(str(EXAMPLE_1))}'**")
         if example2:
-            second.write(f"**Prediction:  '{predict_file(EXAMPLE_2)}'**")
+            second.write(f"**Prediction:  '{ps.make_prediction(str(EXAMPLE_2))}'**")
         if example3:
-            third.write(f"**Prediction:  '{predict_file(EXAMPLE_3)}'**")
+            third.write(f"**Prediction:  '{ps.make_prediction(str(EXAMPLE_3))}'**")
 
 #########################################################################
 if __name__ == '__main__':
