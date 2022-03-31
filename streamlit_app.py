@@ -205,7 +205,9 @@ def main():
             with open(str(UPLOADED), 'wb') as f:
                 f.write(bytes_data)
             # predict with PredictionService
+            st.audio(display_audio(UPLOADED), format='audio/wav')
             st.write(f"**Prediction:  '{predict_file(UPLOADED)}'**")
+
     else:
         # streamlit container-structure
         st.header('Examples')
