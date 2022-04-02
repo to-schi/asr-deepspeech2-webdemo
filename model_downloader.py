@@ -11,7 +11,7 @@ def download_file(url, download_to: Path, expected_size=None):
         if expected_size:
             if download_to.stat().st_size == expected_size:
                 st.session_state['model'] = True
-                st.write("Model found.")
+                #st.write("Model found.")
                 return
         else:
             st.info(f"{url} is already downloaded.")
