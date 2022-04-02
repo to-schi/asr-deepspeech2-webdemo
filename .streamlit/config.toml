@@ -1,10 +1,10 @@
 [server]
 headless = true
-enableCORS = false
+#enableCORS = false
 
 [theme]
 # Primary accent color for interactive elements.
-primaryColor = "#d0fcff" #55edff" #3cffe7" #88e0ff" #"#E694FF"
+primaryColor = "#d0fcff"
 
 # Background color for the main content area.
 backgroundColor = "#00172B"
