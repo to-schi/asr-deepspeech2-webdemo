@@ -1,11 +1,13 @@
-from pathlib import Path
-import os
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-import tensorflow_io as tfio
+# import os
+# os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import keras
-import tensorflow as tf
 import logging
+import streamlit as st
+import tensorflow as tf
+import tensorflow_io as tfio
 from time import sleep
+from pathlib import Path
+tf.get_logger().setLevel('INFO')
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.ERROR)
@@ -71,6 +73,7 @@ def CTCLoss(y_true, y_pred):
         y_true, y_pred, input_length, label_length)
     return loss
 
+@st.cache
 def Prediction_Service():
     if _Prediction_Service._instance is None:
         _Prediction_Service._instance = _Prediction_Service()
