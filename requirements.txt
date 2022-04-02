@@ -2,4 +2,5 @@ streamlit
 tensorflow==2.8.0
 tensorflow_io
 pydub
+librosa
 streamlit_webrtc
