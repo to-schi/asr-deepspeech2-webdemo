@@ -1,13 +1,10 @@
-# import os
-# os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import keras
 import logging
 import streamlit as st
 import tensorflow as tf
 import tensorflow_io as tfio
-from time import sleep
-from pathlib import Path
-tf.get_logger().setLevel('INFO')
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.ERROR)
