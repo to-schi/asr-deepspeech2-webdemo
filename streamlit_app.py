@@ -37,14 +37,20 @@ The word-error-rate is currently at 19%. A good microphone is recommended.\n
 More information can be found [here](https://github.com/to-schi/asr-deepspeech2-webdemo).
 """
 )
-# coloring "st.buttons" in main page light blue:
-m = st.markdown("""
+# color "st.buttons" in main page light blue:
+st.markdown("""
  <style>
  div.stButton > button:first-child {
      background-color: rgb(0, 131, 184);
  }
  </style>""", unsafe_allow_html=True)
-
+# hide menu
+st.markdown(""" <style>
+#MainMenu {visibility: hidden;}
+footer {visibility: hidden;}
+</style> """, unsafe_allow_html=True)
+# sidebar image
+st.sidebar.image("./img/nummer5_w_input.svg")
 
 def read_audio(file):
     audio_file = open(str(file), 'rb')
