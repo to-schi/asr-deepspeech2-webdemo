@@ -1,6 +1,5 @@
 import logging
 import logging.handlers
-import urllib.request
 from pathlib import Path
 import os
 import streamlit as st
@@ -9,13 +8,12 @@ import soundfile as sf
 from web_recorder import record_to_file
 from asr_prediction import Prediction_Service
 from model_downloader import download_file
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 logger = logging.getLogger(__name__)
 
 # Initialize session state for existence of model-file:
 if 'model' not in st.session_state:
     st.session_state['model'] = False
-# file-variables:
+# file+path-variables:
 HERE = Path(__file__).parent
 MODEL_URL = "https://www.dropbox.com/s/woqi5hfh3bn5thk/DeepSpeech_RNN.h5?raw=1"  # noqa
 MODEL_LOCAL_PATH = HERE / "model/DeepSpeech_RNN.h5"
@@ -48,7 +46,6 @@ m = st.markdown("""
  </style>""", unsafe_allow_html=True)
 
 
-#### predict and display#################################################
 def read_audio(file):
     audio_file = open(str(file), 'rb')
     audio_bytes = audio_file.read()
@@ -128,6 +125,7 @@ def main():
 
 #########################################################################
 if __name__ == '__main__':
+    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
     DEBUG = os.environ.get("DEBUG", "false").lower() not in [
         "false", "no", "0"]
 
