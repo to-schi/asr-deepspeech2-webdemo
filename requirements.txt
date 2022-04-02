@@ -3,4 +3,5 @@ tensorflow==2.8.0
 tensorflow_io
 pydub
 librosa
+soundfile
 streamlit_webrtc
