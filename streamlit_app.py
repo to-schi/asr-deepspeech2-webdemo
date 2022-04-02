@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 if 'model' not in st.session_state:
     st.session_state['model'] = False
 
-# file+path-variables
+# file+path-variables:
 HERE = Path(__file__).parent
 MODEL_URL = "https://www.dropbox.com/s/woqi5hfh3bn5thk/DeepSpeech_RNN.h5?raw=1"  # noqa
 MODEL_LOCAL_PATH = HERE / "model/DeepSpeech_RNN.h5"
@@ -39,7 +39,6 @@ The word-error-rate is currently at 19%. A good microphone is recommended.\n
 More information can be found [here](https://github.com/to-schi/asr-deepspeech2-webdemo).
 """
 )
-
 # color "st.buttons" in main page light blue:
 st.markdown("""
  <style>
@@ -47,7 +46,6 @@ st.markdown("""
      background-color: rgb(0, 131, 184);
  }
  </style>""", unsafe_allow_html=True)
-
 # hide menu
 st.markdown(""" <style>
 #MainMenu {visibility: hidden;}
@@ -57,7 +55,7 @@ footer {visibility: hidden;}
 # sidebar image
 st.sidebar.image("./img/nummer5_w_input.svg")
 
-### page-functions #############################################################
+### functions #########################################################################
 def read_audio(file):
     audio_file = open(str(file), 'rb')
     audio_bytes = audio_file.read()
@@ -94,6 +92,7 @@ def main():
             with open(str(UPLOADED), 'wb') as f:
                 f.write(bytes_data)
             # resample to 16000Hz and reduce channels to 1:
+            # ! wave-module produced a "clicking"-noise, switched to librosa
             audio_data, sr = librosa.load(str(UPLOADED))
             audio_data = librosa.to_mono(audio_data)
             audio_data = librosa.resample(audio_data, orig_sr=sr, target_sr=SAMPLERATE)
@@ -134,9 +133,8 @@ def main():
         if example3:
             third.write(f"**Prediction:  '{ps.make_prediction(str(EXAMPLE_3))}'**")
 
-################################################################################
+#########################################################################
 if __name__ == '__main__':
-    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
     DEBUG = os.environ.get("DEBUG", "false").lower() not in [
         "false", "no", "0"]
 
