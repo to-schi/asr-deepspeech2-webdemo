@@ -57,6 +57,7 @@ class _Prediction_Service:
         return output
 
 
+@tf.function(experimental_relax_shapes=True)
 def CTCLoss(y_true, y_pred):
     # Compute the training-time loss value
     batch_len = tf.cast(tf.shape(y_true)[0], dtype="int64")
