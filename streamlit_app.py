@@ -16,7 +16,7 @@ if 'model' not in st.session_state:
 
 # file+path-variables:
 HERE = Path(__file__).parent
-MODEL_URL = "https://www.dropbox.com/s/woqi5hfh3bn5thk/DeepSpeech_RNN.h5?raw=1"  # noqa
+MODEL_URL = "https://www.dropbox.com/s/9ghba71i94977qk/DeepSpeech_RNN.h5?raw=1"  # noqa
 MODEL_LOCAL_PATH = HERE / "model/DeepSpeech_RNN.h5"
 RECORDED = HERE / "recordings/temp.wav"
 UPLOADED = HERE / "recordings/uploaded.wav"

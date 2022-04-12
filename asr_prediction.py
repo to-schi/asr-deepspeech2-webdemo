@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.ERROR)
 
 MODEL_PATH = "./model/DeepSpeech_RNN.h5"
-characters = [x for x in "abcdefghijklmnopqrstuvwxyz'?! "]
+characters = [x for x in "abcdefghijklmnopqrstuvwxyz' "]
 char_to_num = keras.layers.StringLookup(vocabulary=characters, oov_token="")
 num_to_char = keras.layers.StringLookup(vocabulary=char_to_num.get_vocabulary(), oov_token="", invert=True)
 
