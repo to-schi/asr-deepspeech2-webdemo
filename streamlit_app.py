@@ -35,7 +35,7 @@ st.markdown(
     """
 This demo app is using a simplified end-to-end speech recognition engine similar to DeepSpeech2.
 It was trained on the LibriSpeech dataset with 100 hours of English speech and is a work in progress.
-The word-error-rate is currently at 19%. A good microphone is recommended.\n
+The word-error-rate on the validation data is currently at 14%. A good microphone is recommended.\n
 More information can be found [here](https://github.com/to-schi/asr-deepspeech2-webdemo).
 """
 )
