@@ -1,7 +1,7 @@
 [![StreamlitCloud](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://share.streamlit.io/to-schi/asr-deepspeech2-webdemo/main)
 
 # Webdemo of a speech recognition engine with streamlit
-This is a demo of a simplified end-to-end speech recognition engine similar to DeepSpeech2. It was trained on the LibriSpeech dataset with 360 hours of English speech and is a work in progress. The word-error-rate on the validation data is currently at 14%.
+This is a demo of an end-to-end speech recognition engine similar to DeepSpeech2. It was trained on the LibriSpeech dataset with 360 hours of English speech and is a work in progress. The word-error-rate on the validation data is currently at 13%.
 
 ### Options:
 1. Make an own recording directly from the browser
