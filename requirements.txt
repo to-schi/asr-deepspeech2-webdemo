@@ -1,6 +1,6 @@
 streamlit
 tensorflow==2.8.0
-tensorflow_io
+tensorflow-io==0.25
 pydub
 librosa
 soundfile
