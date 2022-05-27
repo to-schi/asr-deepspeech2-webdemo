@@ -37,7 +37,7 @@ class _Prediction_Service:
 
     def decode_predictions(self, pred):
         input_len = tf.ones(pred.shape[0]) * pred.shape[1]
-        # Use greedy search. For complex tasks, you can use beam search
+
         result = keras.backend.ctc_decode(
             pred, input_length=input_len, greedy=True)[0][0]
 
@@ -47,9 +47,9 @@ class _Prediction_Service:
 
 
     def make_prediction(self, file):
-        #if self.model == None:
-        #    self.model = keras.models.load_model(
-        #        MODEL_PATH, custom_objects={'ctc_loss': ctc_loss})
+        if self.model == None:
+            self.model = keras.models.load_model(
+                MODEL_PATH, custom_objects={'ctc_loss': ctc_loss})
         recording = self.encode_audio(file, 16000)
         recording = tf.expand_dims(recording, axis=0)
         output = self.model.predict(recording)

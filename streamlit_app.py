@@ -3,8 +3,7 @@ import logging.handlers
 from pathlib import Path
 import os
 import streamlit as st
-import librosa
-import soundfile as sf
+from pydub import AudioSegment
 from web_recorder import record_to_file
 from asr_prediction import Prediction_Service
 from model_downloader import download_file
@@ -16,7 +15,7 @@ if 'model' not in st.session_state:
 
 # file+path-variables:
 HERE = Path(__file__).parent
-MODEL_URL = "https://www.dropbox.com/s/2p78xr3zlgsfeng/DeepSpeech_RNN.h5?raw=1"
+MODEL_URL = "https://www.dropbox.com/s/w4w9zzz12b0zqcl/RNN_mel2_vl36.3.h5?raw=1"
 MODEL_LOCAL_PATH = HERE / "model/DeepSpeech_RNN.h5"
 RECORDED = HERE / "recordings/temp.wav"
 UPLOADED = HERE / "recordings/uploaded.wav"
@@ -63,7 +62,7 @@ def read_audio(file):
 
 def main():
     # Download model-file if not existing and set session_state['model'] = True
-    download_file(MODEL_URL, MODEL_LOCAL_PATH, expected_size=112500560)
+    download_file(MODEL_URL, MODEL_LOCAL_PATH, expected_size=337407816) #expected_size=112500560)
 
     # set 3 pages to select in sidebar:
     page = st.sidebar.selectbox(
@@ -93,10 +92,16 @@ def main():
                 f.write(bytes_data)
             # resample to 16000Hz and reduce channels to 1:
             # ! wave-module produced a "clicking"-noise, switched to librosa
-            audio_data, sr = librosa.load(str(UPLOADED))
-            audio_data = librosa.to_mono(audio_data)
-            audio_data = librosa.resample(audio_data, orig_sr=sr, target_sr=SAMPLERATE)
-            sf.write(str(RESAMPLED), audio_data, samplerate=SAMPLERATE)
+            # audio_data, sr = librosa.load(str(UPLOADED))
+            # audio_data = librosa.to_mono(audio_data)
+            # audio_data = librosa.resample(audio_data, orig_sr=sr, target_sr=SAMPLERATE)
+            # sf.write(str(RESAMPLED), audio_data, samplerate=SAMPLERATE)
+            #sr = mediainfo(str(UPLOADED)['sample_rate']
+            audio_data = AudioSegment.from_wav(str(UPLOADED))
+            audio_data = audio_data.set_channels(1)
+            audio_data = audio_data.set_frame_rate(SAMPLERATE)
+            audio_data.export(str(RESAMPLED), format="wav")
+
             # predict with PredictionService
             st.audio(read_audio(RESAMPLED), format='audio/wav')
             st.write("Transcribing...")
