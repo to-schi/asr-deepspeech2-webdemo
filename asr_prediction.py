@@ -47,9 +47,9 @@ class _Prediction_Service:
 
 
     def make_prediction(self, file):
-        if self.model == None:
-            self.model = keras.models.load_model(
-                MODEL_PATH, custom_objects={'CTCLoss': CTCLoss})
+        #if self.model == None:
+        #    self.model = keras.models.load_model(
+        #        MODEL_PATH, custom_objects={'ctc_loss': ctc_loss})
         recording = self.encode_audio(file, 16000)
         recording = tf.expand_dims(recording, axis=0)
         output = self.model.predict(recording)
