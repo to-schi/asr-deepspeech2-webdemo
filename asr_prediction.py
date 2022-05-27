@@ -75,7 +75,7 @@ def ctc_loss(y_true, y_pred):
 def Prediction_Service():
     if _Prediction_Service._instance is None:
         _Prediction_Service._instance = _Prediction_Service()
-        _Prediction_Service.model = keras.models.load_model(MODEL_PATH)
+        _Prediction_Service.model = keras.models.load_model(MODEL_PATH, custom_objects={'ctc_loss': ctc_loss})
     return _Prediction_Service._instance
 
 if __name__ == "__main__":
