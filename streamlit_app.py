@@ -91,11 +91,6 @@ def main():
             with open(str(UPLOADED), 'wb') as f:
                 f.write(bytes_data)
             # resample to 16000Hz and reduce channels to 1:
-            # ! wave-module produced a "clicking"-noise, switched to librosa
-            # audio_data, sr = librosa.load(str(UPLOADED))
-            # audio_data = librosa.to_mono(audio_data)
-            # audio_data = librosa.resample(audio_data, orig_sr=sr, target_sr=SAMPLERATE)
-            # sf.write(str(RESAMPLED), audio_data, samplerate=SAMPLERATE)
             #sr = mediainfo(str(UPLOADED)['sample_rate']
             audio_data = AudioSegment.from_wav(str(UPLOADED))
             audio_data = audio_data.set_channels(1)
