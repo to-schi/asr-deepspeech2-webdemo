@@ -29,7 +29,7 @@ class _Prediction_Service:
         spectrogram = tfio.audio.spectrogram(
             audio, nfft=n_fft, window=window, stride=stride)
         mel_spectrogram = tfio.audio.melscale(
-            spectrogram, rate=sr, mels=n_mels, fmin=0, fmax=sr/2)
+            spectrogram, rate=sr, mels=n_mels, fmin=40, fmax=6000)
         dbscale_mel_spectrogram = tfio.audio.dbscale(
             mel_spectrogram, top_db=80)
         return dbscale_mel_spectrogram

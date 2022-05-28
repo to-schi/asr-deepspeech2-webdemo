@@ -15,7 +15,7 @@ if 'model' not in st.session_state:
 
 # file+path-variables:
 HERE = Path(__file__).parent
-MODEL_URL = "https://www.dropbox.com/s/w4w9zzz12b0zqcl/RNN_mel2_vl36.3.h5?raw=1"
+MODEL_URL = "https://www.dropbox.com/s/fuc3ey9fa7fwyxc/RNN_mel2_last_vl36.3.h5?raw=1"
 MODEL_LOCAL_PATH = HERE / "model/DeepSpeech_RNN.h5"
 RECORDED = HERE / "recordings/temp.wav"
 UPLOADED = HERE / "recordings/uploaded.wav"
@@ -62,7 +62,7 @@ def read_audio(file):
 
 def main():
     # Download model-file if not existing and set session_state['model'] = True
-    download_file(MODEL_URL, MODEL_LOCAL_PATH, expected_size=337407816) #expected_size=112500560)
+    download_file(MODEL_URL, MODEL_LOCAL_PATH, expected_size=112500560) #expected_size= 112500560 337407816
 
     # set 3 pages to select in sidebar:
     page = st.sidebar.selectbox(
