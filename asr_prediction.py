@@ -24,12 +24,13 @@ class _Prediction_Service:
     def encode_audio(self, file, sr=16000, n_fft=2048, stride=128, window=256, n_mels=256):
         # open
         audio = tf.io.read_file(file)
-        audio, _ = tf.audio.decode_wav(audio, desired_channels=1)
-        #audio = tfio.audio.decode_wav(audio, dtype=tf.int16)
+        #audio, _ = tf.audio.decode_wav(audio, desired_channels=1)
+        audio = tfio.audio.decode_wav(audio, dtype=tf.int16)
 
         # resample:
         with wave.open(file, 'rb') as f:
             rate_in = f.getframerate()
+        logging.critical(rate_in)
         if rate_in != sr:
             audio = tfio.audio.resample(audio, rate_in=rate_in, rate_out=sr)
 
