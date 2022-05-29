@@ -5,6 +5,7 @@ import logging
 import streamlit as st
 import tensorflow as tf
 import tensorflow_io as tfio
+import wave
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.ERROR)
@@ -21,13 +22,14 @@ class _Prediction_Service:
 
     @tf.function(experimental_relax_shapes=True)
     def encode_audio(self, file, sr=16000, n_fft=2048, stride=128, window=256, n_mels=256):
+        # open
         audio = tf.io.read_file(file)
-        audio = tfio.audio.decode_wav(audio, dtype=tf.int16)
+        audio, _ = tf.audio.decode_wav(audio, desired_channels=1)
+        #audio = tfio.audio.decode_wav(audio, dtype=tf.int16)
 
-        # resample if necessary:
-        audio_tensor = tfio.audio.AudioIOTensor(file, dtype=tf.int64)
-        
-        rate_in = int(audio_tensor.rate)
+        # resample:
+        with wave.open(file, 'rb') as f:
+            rate_in = f.getframerate()
         if rate_in != sr:
             audio = tfio.audio.resample(audio, rate_in=rate_in, rate_out=sr)
 
