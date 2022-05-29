@@ -18,7 +18,6 @@ MODEL_URL = "https://www.dropbox.com/s/w4sii4o7fa4mxds/RNN_mel2_last_vl35.6.h5?r
 MODEL_LOCAL_PATH = HERE / "model/DeepSpeech_RNN.h5"
 RECORDED = HERE / "recordings/temp.wav"
 UPLOADED = HERE / "recordings/uploaded.wav"
-RESAMPLED = HERE / "recordings/resampled.wav"
 EXAMPLE_1 = HERE / "recordings/destroy_him_my_robots.wav"
 EXAMPLE_2 = HERE / "recordings/the_jungle_book2.wav"
 EXAMPLE_3 = HERE / "recordings/the_jungle_book1.wav"
