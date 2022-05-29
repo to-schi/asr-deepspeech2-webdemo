@@ -19,6 +19,7 @@ MODEL_URL = "https://www.dropbox.com/s/w4sii4o7fa4mxds/RNN_mel2_last_vl35.6.h5?r
 MODEL_LOCAL_PATH = HERE / "model/DeepSpeech_RNN.h5"
 RECORDED = HERE / "recordings/temp.wav"
 UPLOADED = HERE / "recordings/uploaded.wav"
+RESAMPLED = HERE / "recordings/resampled.wav"
 EXAMPLE_1 = HERE / "recordings/destroy_him_my_robots.wav"
 EXAMPLE_2 = HERE / "recordings/the_jungle_book2.wav"
 EXAMPLE_3 = HERE / "recordings/the_jungle_book1.wav"
@@ -89,7 +90,7 @@ def main():
             bytes_data = uploaded_file.getvalue()
             with open(str(UPLOADED), 'wb') as f:
                 f.write(bytes_data)
-                
+
             # resample to 16000Hz and reduce channels to 1:
             audio_data = AudioSegment.from_wav(str(UPLOADED))
             audio_data = audio_data.set_channels(1)
