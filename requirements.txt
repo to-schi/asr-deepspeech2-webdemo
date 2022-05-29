@@ -1,6 +1,5 @@
 streamlit
 tensorflow==2.8.0
 tensorflow-io==0.25
-ffmpeg-python
 pydub
 streamlit_webrtc

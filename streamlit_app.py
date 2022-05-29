@@ -89,12 +89,6 @@ def main():
             bytes_data = uploaded_file.getvalue()
             with open(str(UPLOADED), 'wb') as f:
                 f.write(bytes_data)
-            # resample to 16000Hz and reduce channels to 1:
-            #sr = mediainfo(str(UPLOADED)['sample_rate']
-            #audio_data = AudioSegment.from_wav(str(UPLOADED))
-            #audio_data = audio_data.set_channels(1)
-            #audio_data = audio_data.set_frame_rate(SAMPLERATE)
-            #audio_data.export(str(RESAMPLED), format="wav")
 
             # predict with PredictionService
             st.audio(read_audio(UPLOADED), format='audio/wav')
