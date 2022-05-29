@@ -3,7 +3,6 @@ import logging.handlers
 from pathlib import Path
 import os
 import streamlit as st
-from pydub import AudioSegment
 from web_recorder import record_to_file
 from asr_prediction import Prediction_Service
 from model_downloader import download_file
@@ -15,7 +14,7 @@ if 'model' not in st.session_state:
 
 # file+path-variables:
 HERE = Path(__file__).parent
-MODEL_URL = "https://www.dropbox.com/s/fuc3ey9fa7fwyxc/RNN_mel2_last_vl36.3.h5?raw=1"
+MODEL_URL = "https://www.dropbox.com/s/w4sii4o7fa4mxds/RNN_mel2_last_vl35.6.h5?raw=1"
 MODEL_LOCAL_PATH = HERE / "model/DeepSpeech_RNN.h5"
 RECORDED = HERE / "recordings/temp.wav"
 UPLOADED = HERE / "recordings/uploaded.wav"
@@ -92,15 +91,15 @@ def main():
                 f.write(bytes_data)
             # resample to 16000Hz and reduce channels to 1:
             #sr = mediainfo(str(UPLOADED)['sample_rate']
-            audio_data = AudioSegment.from_wav(str(UPLOADED))
-            audio_data = audio_data.set_channels(1)
-            audio_data = audio_data.set_frame_rate(SAMPLERATE)
-            audio_data.export(str(RESAMPLED), format="wav")
+            #audio_data = AudioSegment.from_wav(str(UPLOADED))
+            #audio_data = audio_data.set_channels(1)
+            #audio_data = audio_data.set_frame_rate(SAMPLERATE)
+            #audio_data.export(str(RESAMPLED), format="wav")
 
             # predict with PredictionService
-            st.audio(read_audio(RESAMPLED), format='audio/wav')
+            st.audio(read_audio(UPLOADED), format='audio/wav')
             st.write("Transcribing...")
-            prediction = ps.make_prediction(str(RESAMPLED))
+            prediction = ps.make_prediction(str(UPLOADED))
             st.write(f"**Prediction:  '{prediction}'**")
 
     else:

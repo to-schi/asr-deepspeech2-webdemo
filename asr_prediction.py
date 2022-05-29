@@ -3,6 +3,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import keras
 import logging
 import streamlit as st
+from pydub.utils import mediainfo
 import tensorflow as tf
 import tensorflow_io as tfio
 
@@ -23,6 +24,10 @@ class _Prediction_Service:
     def encode_audio(self, file, sr=16000, n_fft=2048, stride=128, window=256, n_mels=256):
         audio = tf.io.read_file(file)
         audio = tfio.audio.decode_wav(audio, dtype=tf.int16)
+
+        rate_in =  mediainfo(file)['samplerate']
+        if rate_in != sr:
+            audio = tfio.audio.resample(audio, rate_in, rate_out=sr, name=None)
         audio = audio / tf.reduce_max(audio)
         audio = tf.squeeze(audio, axis=-1)
         audio = tf.cast(audio, tf.float32)
