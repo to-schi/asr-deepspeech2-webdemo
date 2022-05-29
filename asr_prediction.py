@@ -25,7 +25,7 @@ class _Prediction_Service:
         audio = tfio.audio.decode_wav(audio, dtype=tf.int16)
 
         # resample if necessary:
-        audio_tensor = tfio.audio.AudioIOTensor(file)
+        audio_tensor = tfio.audio.AudioIOTensor(file, dtype=tf.int16)
         rate_in = audio_tensor.rate.numpy()
         if rate_in != sr:
             audio = tfio.audio.resample(audio, rate_in=rate_in, rate_out=sr)
