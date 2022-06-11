@@ -60,16 +60,28 @@ class _Prediction_Service:
 
 @tf.function(experimental_relax_shapes=True)
 def ctc_loss(y_true, y_pred):
-    # Compute the training-time loss value
     batch_len = tf.cast(tf.shape(y_true)[0], dtype="int64")
+
     input_length = tf.cast(tf.shape(y_pred)[1], dtype="int64")
     label_length = tf.cast(tf.shape(y_true)[1], dtype="int64")
 
     input_length = input_length * tf.ones(shape=(batch_len, 1), dtype="int64")
     label_length = label_length * tf.ones(shape=(batch_len, 1), dtype="int64")
 
-    loss = keras.backend.ctc_batch_cost(
-        y_true, y_pred, input_length, label_length)
+    input_length = tf.cast(tf.squeeze(input_length, axis=-1), tf.int32)
+    label_length = tf.cast(tf.squeeze(label_length, axis=-1), tf.int32)
+
+    sparse_labels = tf.cast(keras.backend.ctc_label_dense_to_sparse(y_true, label_length), tf.int32)
+    y_pred = tf.math.log(tf.compat.v1.transpose(y_pred, perm=[1, 0, 2]) + keras.backend.epsilon() )
+
+    loss = tf.expand_dims(
+            tf.compat.v1.nn.ctc_loss_v2 (
+                labels=sparse_labels,
+                logits=y_pred,
+                label_length=label_length,
+                logit_length=input_length,
+                blank_index=29
+                ), 1)
     return loss
 
 @st.cache

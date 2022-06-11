@@ -15,7 +15,7 @@ if 'model' not in st.session_state:
 
 # file+path-variables:
 HERE = Path(__file__).parent
-MODEL_URL = "https://www.dropbox.com/s/w4sii4o7fa4mxds/RNN_mel2_last_vl35.6.h5?raw=1"
+MODEL_URL = "https://www.dropbox.com/s/yxhhoyhhasmfn1g/RNN_mel2_ctc2-29_last_vl33.7.h5?raw=1"
 MODEL_LOCAL_PATH = HERE / "model/DeepSpeech_RNN.h5"
 RECORDED = HERE / "recordings/temp.wav"
 UPLOADED = HERE / "recordings/uploaded.wav"
@@ -34,7 +34,7 @@ st.markdown(
     """
 This demo app is using a simplified end-to-end speech recognition engine similar to DeepSpeech2.
 It was trained on the LibriSpeech dataset with 100 hours of English speech and is a work in progress.
-The word-error-rate on the test data is currently at 14%. A good microphone is recommended.\n
+The word-error-rate on the test data is currently at 13%. A good microphone is recommended.\n
 More information can be found [here](https://github.com/to-schi/speech-recognition-from-scratch).
 """
 )
