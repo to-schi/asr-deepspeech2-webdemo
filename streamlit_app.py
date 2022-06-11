@@ -32,9 +32,9 @@ st.set_page_config(page_title="Speech Recognition Demo",
 st.title('Speech Recognition Demo')
 st.markdown(
     """
-This demo app is using a simplified end-to-end speech recognition engine similar to DeepSpeech2.
+This demo app is using an end-to-end speech recognition engine similar to DeepSpeech2.
 It was trained on the LibriSpeech dataset with 960 hours of English speech and is a work in progress.
-The word-error-rate on the test data is currently at 13%. A good microphone is recommended.\n
+The word-error-rate on the test data is currently at 10%. A good microphone is recommended.\n
 More information can be found [here](https://github.com/to-schi/speech-recognition-from-scratch).
 """
 )
