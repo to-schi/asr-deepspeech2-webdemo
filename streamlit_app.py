@@ -80,6 +80,10 @@ def main():
                 st.write(f"**Prediction:  '{prediction}'**")
                 st.download_button(
                     "Save recorded file", read_audio(RECORDED), 'audio')
+                    
+            delete_rec = st.button('Delete recording')
+            if delete_rec:
+                os.remove(RECORDED)
 
     elif page == 'Open wav-file':
         st.header('Open wav-file')
