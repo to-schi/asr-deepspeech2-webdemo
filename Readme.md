@@ -1,3 +1,4 @@
+<!-- markdownlint-disable -->
 # Webdemo of a speech recognition engine with streamlit
 [![StreamlitCloud](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://share.streamlit.io/to-schi/asr-deepspeech2-webdemo/main)
 [![Lint Code Base](https://github.com/to-schi/asr-deepspeech2-webdemo/actions/workflows/super-linter.yml/badge.svg)](https://github.com/to-schi/asr-deepspeech2-webdemo/actions/workflows/super-linter.yml)

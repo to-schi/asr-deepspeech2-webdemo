@@ -29,7 +29,7 @@ def download_file(url, download_to: Path, expected_size=None):
     # These are handles to two visual elements to animate.
     weights_warning, progress_bar = None, None
     try:
-        weights_warning = st.warning("Downloading %s..." % url)
+        weights_warning = st.warning(f"Downloading {url}...")
         progress_bar = st.progress(0)
         with open(download_to, "wb") as output_file:
             with urllib.request.urlopen(url) as response:
@@ -43,13 +43,12 @@ def download_file(url, download_to: Path, expected_size=None):
                     counter += len(data)
                     output_file.write(data)
 
-                    # We perform animation by overwriting the elements.
+                    # performs animation by overwriting the elements.
                     weights_warning.warning(
-                        "Downloading %s... (%6.2f/%6.2f MB)"
-                        % (url, counter / megabytes, length / megabytes)
+                        f"Downloading {url}... ({counter / megabytes}6.2f/{length / megabytes}6.2f MB)"
                     )
                     progress_bar.progress(min(counter / length, 1.0))
-    # Finally, we remove these visual elements by calling .empty().
+    # remove visual elements by calling .empty().
     finally:
         if weights_warning is not None:
             weights_warning.empty()
