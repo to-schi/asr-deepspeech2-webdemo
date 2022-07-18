@@ -1,10 +1,12 @@
-import streamlit as st
-import urllib.request
 from pathlib import Path
+import urllib.request
+import streamlit as st
 
-'''file-download based on
-https://github.com/streamlit/demo-self-driving/blob/230245391f2dda0cb464008195a470751c01770b/streamlit_app.py#L48'''
+
+
 def download_file(url, download_to: Path, expected_size=None):
+    '''file-download based on
+    https://github.com/streamlit/demo-self-driving/blob/230245391f2dda0cb464008195a470751c01770b/streamlit_app.py#L48'''
     # Don't download the file twice.
     # (If possible, verify the download using the file length.)
     if download_to.exists():
