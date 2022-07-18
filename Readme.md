@@ -4,7 +4,7 @@
 
 This is a demo of an [end-to-end speech recognition engine](https://github.com/to-schi/speech-recognition-from-scratch) similar to DeepSpeech2. It was trained on the LibriSpeech dataset with 960 hours of English speech and is a work in progress. The word-error-rate on the test data is currently at 10%.
 
-### Options:
+## Options
 1. Make an own recording directly from the browser
 2. Upload a wav-file from your computer
 3. Try out examples from the app
