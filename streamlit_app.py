@@ -1,6 +1,7 @@
 """
 Streamlit application for the demo of ASR Deepspeech2-Keras
 """
+# pylint: disable=C0301
 import logging
 import logging.handlers
 import os
@@ -39,14 +40,14 @@ st.set_page_config(page_title="Speech Recognition Demo", page_icon=":robot_face:
 st.title("Speech Recognition Demo")
 st.markdown(
     """
-This demo app is using an end-to-end speech recognition 
-engine similar to DeepSpeech2. It was trained on the LibriSpeech 
-dataset with 960 hours of English speech and is a 
-work in progress. The word-error-rate on the test data is currently at 10%. 
-A good microphone is recommended.\n
-More information can be found 
-[here](https://github.com/to-schi/speech-recognition-from-scratch).
-"""
+    This demo app is using an end-to-end speech recognition 
+    engine similar to DeepSpeech2. It was trained on the LibriSpeech 
+    dataset with 960 hours of English speech and is a 
+    work in progress. The word-error-rate on the test data is currently at 10%. 
+    A good microphone is recommended.\n
+    More information can be found 
+    [here](https://github.com/to-schi/speech-recognition-from-scratch).
+    """
 )
 # color "st.buttons" in main page light blue:
 st.markdown(

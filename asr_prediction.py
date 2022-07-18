@@ -1,12 +1,14 @@
 """
 Prediction Service for Deepspeech2-Keras
 """
+# pylint: disable=C0301
 import logging
 import os
 
 import streamlit as st
 import tensorflow as tf
 import tensorflow_io as tfio
+from tensorflow.keras import backend as k
 from tensorflow.keras.layers import StringLookup  # type: ignore
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
@@ -54,9 +56,7 @@ class PredictionService:
 
         input_len = tf.ones(pred.shape[0]) * pred.shape[1]
 
-        result = tf.keras.backend.ctc_decode(pred, input_length=input_len, greedy=True)[
-            0
-        ][0]
+        result = k.ctc_decode(pred, input_length=input_len, greedy=True)[0][0]
 
         result = tf.strings.reduce_join(num_to_char(result)).numpy().decode("utf-8")
         return result
@@ -94,11 +94,11 @@ def ctc_loss(y_true, y_pred):
         tf.keras.backend.ctc_label_dense_to_sparse(y_true, label_length), tf.int32
     )
     y_pred = tf.math.log(
-        tf.compat.v1.transpose(y_pred, perm=[1, 0, 2]) + tf.keras.backend.epsilon()
+        tf.transpose(y_pred, perm=[1, 0, 2]) + tf.keras.backend.epsilon()
     )
 
     loss = tf.expand_dims(
-        tf.compat.v1.nn.ctc_loss_v2(
+        tf.nn.ctc_loss(
             labels=sparse_labels,
             logits=y_pred,
             label_length=label_length,

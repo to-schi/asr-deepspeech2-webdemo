@@ -1,6 +1,7 @@
-'''
+"""
 Module to download the model-file on sstart
-'''
+"""
+# pylint: disable=C0301
 import urllib.request
 from pathlib import Path
 

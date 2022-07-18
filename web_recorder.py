@@ -1,6 +1,7 @@
 """
 Module for webrtc stream-recording
 """
+# pylint: disable=C0301
 import queue
 
 import pydub
