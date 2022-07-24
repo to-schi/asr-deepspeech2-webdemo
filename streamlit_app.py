@@ -39,8 +39,8 @@ st.set_page_config(page_title="Speech Recognition Demo", page_icon=":robot_face:
 st.title("Speech Recognition Demo")
 st.markdown(
     """
-This demo app is using the Deepspeech2 ASR-architecture implemented in Tensorflow.
-It was trained on the LibriSpeech dataset with 960 hours of English speech and is a work in progress.
+This demo app is presenting an end-to-end speech recognition engine similar to [DeepSpeech2](https://arxiv.org/abs/1512.02595).
+It was implemented in Tensorflow and trained on the LibriSpeech dataset with 960 hours of English speech.
 The word-error-rate on the test data is currently at 11%. A good microphone is recommended.\n
 More information can be found [here](https://github.com/to-schi/ASR-Deepspeech2-Tensorflow).
 """
