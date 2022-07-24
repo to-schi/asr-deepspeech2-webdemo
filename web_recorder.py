@@ -1,10 +1,6 @@
-<<<<<<< HEAD
-=======
 """
 Module for webrtc stream-recording
 """
-# pylint: disable=C0301
->>>>>>> 255eb2db8f1251f554343f171384cc57f3f8380d
 import queue
 
 import pydub
@@ -26,7 +22,6 @@ def detect_leading_silence(sound, silence_threshold=-30.0, chunk_size=5):
 
 
 def trim_silence(sound):
-    """trims silent parts of audio-data"""
     start_trim = detect_leading_silence(sound)
     end_trim = detect_leading_silence(sound.reverse())
     duration = len(sound)
@@ -34,9 +29,10 @@ def trim_silence(sound):
     return trimmed_sound
 
 
-# based on https://github.com/whitphx/streamlit-webrtc##########
-def record_to_file(filename):
-    """records audio-stream from web-client to a file on the server"""
+def record_to_file(FILENAME):
+    """
+    based on https://github.com/whitphx/streamlit-webrtc
+    """
     webrtc_ctx = webrtc_streamer(
         key="sendonly-audio",
         mode=WebRtcMode.SENDONLY,
@@ -85,6 +81,6 @@ def record_to_file(filename):
         audio_buffer = trim_silence(audio_buffer)
         # resample to 16000sr, 1ch, 16bit
         audio_buffer = audio_buffer.set_frame_rate(16000).set_channels(1)
-        audio_buffer.export(str(filename), format="wav")
+        audio_buffer.export(str(FILENAME), format="wav")
         # Reset
         st.session_state["audio_buffer"] = pydub.AudioSegment.empty()

@@ -1,34 +1,23 @@
-<<<<<<< HEAD
-=======
 """
 Prediction Service for Deepspeech2-Keras
 """
-# pylint: disable=C0301
 import logging
->>>>>>> 255eb2db8f1251f554343f171384cc57f3f8380d
 import os
-
-os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
-import logging
 
 import keras
 import streamlit as st
 import tensorflow as tf
 import tensorflow_io as tfio
-<<<<<<< HEAD
-=======
-from tensorflow.keras import backend as k
-from tensorflow.keras.layers import StringLookup  # type: ignore
->>>>>>> 255eb2db8f1251f554343f171384cc57f3f8380d
 
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.ERROR)
 
 MODEL_PATH = "./model/DeepSpeech_RNN.h5"
-characters = [x for x in "abcdefghijklmnopqrstuvwxyz' "]
-char_to_num = keras.layers.StringLookup(vocabulary=characters, oov_token="")
-num_to_char = keras.layers.StringLookup(
-    vocabulary=char_to_num.get_vocabulary(), oov_token="", invert=True
+characters = list("abcdefghijklmnopqrstuvwxyz' ")
+char_to_int = keras.layers.StringLookup(vocabulary=characters, oov_token="")
+int_to_char = keras.layers.StringLookup(
+    vocabulary=char_to_int.get_vocabulary(), oov_token="", invert=True
 )
 
 
@@ -55,21 +44,55 @@ class _Prediction_Service:
         dbscale_mel_spectrogram = tfio.audio.dbscale(mel_spectrogram, top_db=80)
         return dbscale_mel_spectrogram
 
+    def ctc_decoding(
+        self, y_pred, input_length, greedy=True, beam_width=100, top_paths=1
+    ):
+        """
+        Based on: https://github.com/keras-team/keras/blob/master/keras/backend.py
+        """
+        input_shape = keras.backend.shape(y_pred)
+        num_samples, num_steps = input_shape[0], input_shape[1]
+        y_pred = tf.math.log(
+            tf.transpose(y_pred, perm=[1, 0, 2]) + keras.backend.epsilon()
+        )
+        input_length = tf.cast(input_length, tf.int32)
+
+        if greedy:
+            (decoded, log_prob) = tf.nn.ctc_greedy_decoder(
+                inputs=y_pred,
+                sequence_length=input_length,
+                blank_index=0,  # Default: num_classes - 1 , here="oov_token"=0
+            )
+        else:
+            (decoded, log_prob) = tf.nn.ctc_beam_search_decoder(
+                inputs=y_pred,
+                sequence_length=input_length,
+                beam_width=beam_width,
+                top_paths=top_paths,
+            )
+        decoded_dense = []
+        for st in decoded:
+            st = tf.SparseTensor(st.indices, st.values, (num_samples, num_steps))
+            decoded_dense.append(
+                tf.sparse.to_dense(sp_input=st, default_value=None)
+            )  # backend.py: default_value=-1
+        return (decoded_dense, log_prob)
+
     def decode_predictions(self, pred):
+        """
+        Takes prediction-logits and decodes to text.
+        """
         input_len = tf.ones(pred.shape[0]) * pred.shape[1]
 
-<<<<<<< HEAD
-        result = keras.backend.ctc_decode(pred, input_length=input_len, greedy=True)[0][
-            0
-        ]
-=======
-        result = k.ctc_decode(pred, input_length=input_len, greedy=True)[0][0]
->>>>>>> 255eb2db8f1251f554343f171384cc57f3f8380d
+        result = self.ctc_decoding(pred, input_len, greedy=True)[0][0]
 
-        result = tf.strings.reduce_join(num_to_char(result)).numpy().decode("utf-8")
+        result = tf.strings.reduce_join(int_to_char(result)).numpy().decode("utf-8")
         return result
 
     def make_prediction(self, file):
+        """
+        Main prediction function
+        """
         if self.model == None:
             self.model = keras.models.load_model(
                 MODEL_PATH, custom_objects={"ctc_loss": ctc_loss}
@@ -83,13 +106,17 @@ class _Prediction_Service:
 
 @tf.function(experimental_relax_shapes=True)
 def ctc_loss(y_true, y_pred):
-    batch_len = tf.cast(tf.shape(y_true)[0], dtype="int64")
+    """
+    Loss function based on:
+    https://github.com/keras-team/keras/blob/253dc4604479b832dd254d0d348c0b3e7e53fe0f/keras/backend.py
+    """
+    batch_len = tf.cast(tf.shape(y_true)[0], dtype=tf.int64)
 
-    input_length = tf.cast(tf.shape(y_pred)[1], dtype="int64")
-    label_length = tf.cast(tf.shape(y_true)[1], dtype="int64")
+    input_length = tf.cast(tf.shape(y_pred)[1], dtype=tf.int64)
+    label_length = tf.cast(tf.shape(y_true)[1], dtype=tf.int64)
 
-    input_length = input_length * tf.ones(shape=(batch_len, 1), dtype="int64")
-    label_length = label_length * tf.ones(shape=(batch_len, 1), dtype="int64")
+    input_length = input_length * tf.ones(shape=(batch_len, 1), dtype=tf.int64)
+    label_length = label_length * tf.ones(shape=(batch_len, 1), dtype=tf.int64)
 
     input_length = tf.cast(tf.squeeze(input_length, axis=-1), tf.int32)
     label_length = tf.cast(tf.squeeze(label_length, axis=-1), tf.int32)
@@ -97,13 +124,7 @@ def ctc_loss(y_true, y_pred):
     sparse_labels = tf.cast(
         keras.backend.ctc_label_dense_to_sparse(y_true, label_length), tf.int32
     )
-    y_pred = tf.math.log(
-<<<<<<< HEAD
-        tf.compat.v1.transpose(y_pred, perm=[1, 0, 2]) + keras.backend.epsilon()
-=======
-        tf.transpose(y_pred, perm=[1, 0, 2]) + tf.keras.backend.epsilon()
->>>>>>> 255eb2db8f1251f554343f171384cc57f3f8380d
-    )
+    y_pred = tf.math.log(tf.transpose(y_pred, perm=[1, 0, 2]) + keras.backend.epsilon())
 
     loss = tf.expand_dims(
         tf.nn.ctc_loss(
@@ -111,7 +132,7 @@ def ctc_loss(y_true, y_pred):
             logits=y_pred,
             label_length=label_length,
             logit_length=input_length,
-            blank_index=29,
+            blank_index=0,
         ),
         1,
     )

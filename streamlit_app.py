@@ -1,7 +1,6 @@
 """
 Streamlit application for the demo of ASR Deepspeech2-Keras
 """
-# pylint: disable=C0301
 import logging
 import logging.handlers
 import os
@@ -10,11 +9,7 @@ from pathlib import Path
 import streamlit as st
 from pydub import AudioSegment
 
-<<<<<<< HEAD
 from asr_prediction import Prediction_Service
-=======
-from asr_prediction import PredictionService
->>>>>>> 255eb2db8f1251f554343f171384cc57f3f8380d
 from model_downloader import download_file
 from web_recorder import record_to_file
 
@@ -27,9 +22,9 @@ if "model" not in st.session_state:
 # file+path-variables:
 HERE = Path(__file__).parent
 MODEL_URL = (
-    "https://www.dropbox.com/s/yxhhoyhhasmfn1g/RNN_mel2_ctc2-29_last_vl33.7.h5?raw=1"
+    "https://www.dropbox.com/s/ofbc4jjhkw0wdue/RNN_ctc2_6000_29out_vl23.49.h5?raw=1"
 )
-MODEL_LOCAL_PATH = HERE / "model/DeepSpeech_RNN.h5"
+MODEL_LOCAL_PATH = HERE / "model/DeepSpeech2_RNN.h5"
 RECORDED = HERE / "recordings/temp.wav"
 UPLOADED = HERE / "recordings/uploaded.wav"
 RESAMPLED = HERE / "recordings/resampled.wav"
@@ -44,22 +39,11 @@ st.set_page_config(page_title="Speech Recognition Demo", page_icon=":robot_face:
 st.title("Speech Recognition Demo")
 st.markdown(
     """
-<<<<<<< HEAD
 This demo app is using a simplified end-to-end speech recognition engine similar to DeepSpeech2.
 It was trained on the LibriSpeech dataset with 100 hours of English speech and is a work in progress.
 The word-error-rate on the test data is currently at 13%. A good microphone is recommended.\n
 More information can be found [here](https://github.com/to-schi/speech-recognition-from-scratch).
 """
-=======
-    This demo app is using an end-to-end speech recognition 
-    engine similar to DeepSpeech2. It was trained on the LibriSpeech 
-    dataset with 960 hours of English speech and is a 
-    work in progress. The word-error-rate on the test data is currently at 10%. 
-    A good microphone is recommended.\n
-    More information can be found 
-    [here](https://github.com/to-schi/speech-recognition-from-scratch).
-    """
->>>>>>> 255eb2db8f1251f554343f171384cc57f3f8380d
 )
 # color "st.buttons" in main page light blue:
 st.markdown(
@@ -83,30 +67,24 @@ footer {visibility: hidden;}
 # sidebar image
 st.sidebar.image("./img/nummer5_w_input.svg")
 
-
+### functions #########################################################################
 def read_audio(file):
-<<<<<<< HEAD
-=======
     """
     reads an audio-file to bytes
     """
->>>>>>> 255eb2db8f1251f554343f171384cc57f3f8380d
     audio_file = open(str(file), "rb")
     audio_bytes = audio_file.read()
     return audio_bytes
 
 
 def main():
-<<<<<<< HEAD
+    """
+    Main function for defining streamlit page-behaviour
+    """
     # Download model-file if not existing and set session_state['model'] = True
-=======
-    """
-    Download model-file if not existing and set session_state['model'] = True
-    """
->>>>>>> 255eb2db8f1251f554343f171384cc57f3f8380d
     download_file(
-        MODEL_URL, MODEL_LOCAL_PATH, expected_size=112500560
-    )  # expected_size= 112500560 337407816
+        MODEL_URL, MODEL_LOCAL_PATH, expected_size=112496464
+    )  # expected_size= 337407816 112500560 112496464
 
     # set 3 pages to select in sidebar:
     page = st.sidebar.selectbox(
@@ -116,36 +94,32 @@ def main():
     if page == "Record speech":
         st.header("Record speech")
         record_to_file(RECORDED)
+
         if RECORDED.exists() is True:
             st.write("Recording found.")
             st.audio(read_audio(RECORDED), format="audio/wav")
+
             predict_rec = st.button("Transcribe recording")
             if predict_rec:
                 prediction = ps.make_prediction(str(RECORDED))
                 st.write(f"**Prediction:  '{prediction}'**")
                 st.download_button("Save recorded file", read_audio(RECORDED), "audio")
-<<<<<<< HEAD
-=======
 
+            # Creates a button to delete the current recorded file from the server.
             delete_rec = st.button("Delete recording")
             if delete_rec:
                 os.remove(RECORDED)
->>>>>>> 255eb2db8f1251f554343f171384cc57f3f8380d
 
     elif page == "Open wav-file":
         st.header("Open wav-file")
         # create upload button:
         uploaded_file = st.file_uploader("")
+
         if uploaded_file is not None:
             # Uploaded file is saved to the server as "uploaded.wav":
             bytes_data = uploaded_file.getvalue()
-<<<<<<< HEAD
             with open(str(UPLOADED), "wb") as f:
                 f.write(bytes_data)
-=======
-            with open(str(UPLOADED), "wb") as file:
-                file.write(bytes_data)
->>>>>>> 255eb2db8f1251f554343f171384cc57f3f8380d
 
             # resample to 16000Hz and reduce channels to 1:
             audio_data = AudioSegment.from_wav(str(UPLOADED))
@@ -175,21 +149,12 @@ def main():
         second.write(
             "Text: 'there was a long hush for no single wolf cared to fight' (The Jungle Book)"
         )
-<<<<<<< HEAD
-=======
-
->>>>>>> 255eb2db8f1251f554343f171384cc57f3f8380d
         example2 = second.button("Transcribe", key=2)
 
         third.markdown("""---""")
         third.audio(read_audio(EXAMPLE_3), format="audio/wav")
         third.write(
-<<<<<<< HEAD
             "Text: 'and he grew very tired of saying the same thing over a hundred times' (The Jungle Book)"
-=======
-            "Text: 'and he grew very tired of saying the same"
-            "thing over a hundred times' (The Jungle Book)"
->>>>>>> 255eb2db8f1251f554343f171384cc57f3f8380d
         )
         example3 = third.button("Transcribe", key=3)
 
@@ -218,11 +183,6 @@ if __name__ == "__main__":
     fsevents_logger = logging.getLogger("fsevents")
     fsevents_logger.setLevel(logging.WARNING)
 
-<<<<<<< HEAD
-    if st.session_state["model"] == True:
-        ps = Prediction_Service()
-=======
     if st.session_state["model"] is True:
-        ps = PredictionService()
->>>>>>> 255eb2db8f1251f554343f171384cc57f3f8380d
+        ps = Prediction_Service()
     main()
