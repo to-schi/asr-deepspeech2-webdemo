@@ -130,3 +130,5 @@ dmypy.json
 model/DeepSpeech_RNN.h5
 recordings/resampled.wav
 recordings/uploaded.wav
+
+.vscode/s

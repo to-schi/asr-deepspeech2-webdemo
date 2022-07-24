@@ -1,13 +1,25 @@
+<<<<<<< HEAD
+=======
+"""
+Module to download the model-file on sstart
+"""
+# pylint: disable=C0301
+>>>>>>> 255eb2db8f1251f554343f171384cc57f3f8380d
 import urllib.request
 from pathlib import Path
 
 import streamlit as st
 
+<<<<<<< HEAD
 """file-download based on
 https://github.com/streamlit/demo-self-driving/blob/230245391f2dda0cb464008195a470751c01770b/streamlit_app.py#L48"""
 
+=======
+>>>>>>> 255eb2db8f1251f554343f171384cc57f3f8380d
 
 def download_file(url, download_to: Path, expected_size=None):
+    """file-download based on
+    https://github.com/streamlit/demo-self-driving/blob/230245391f2dda0cb464008195a470751c01770b/streamlit_app.py#L48"""
     # Don't download the file twice.
     # (If possible, verify the download using the file length.)
     if download_to.exists():
@@ -26,13 +38,17 @@ def download_file(url, download_to: Path, expected_size=None):
     # These are handles to two visual elements to animate.
     weights_warning, progress_bar = None, None
     try:
-        weights_warning = st.warning("Downloading %s..." % url)
+        weights_warning = st.warning(f"Downloading {url}...")
         progress_bar = st.progress(0)
         with open(download_to, "wb") as output_file:
             with urllib.request.urlopen(url) as response:
                 length = int(response.info()["Content-Length"])
                 counter = 0.0
+<<<<<<< HEAD
                 MEGABYTES = 2.0**20.0
+=======
+                megabytes = 2.0**20.0
+>>>>>>> 255eb2db8f1251f554343f171384cc57f3f8380d
                 while True:
                     data = response.read(8192)
                     if not data:
@@ -40,13 +56,12 @@ def download_file(url, download_to: Path, expected_size=None):
                     counter += len(data)
                     output_file.write(data)
 
-                    # We perform animation by overwriting the elements.
+                    # performs animation by overwriting the elements.
                     weights_warning.warning(
-                        "Downloading %s... (%6.2f/%6.2f MB)"
-                        % (url, counter / MEGABYTES, length / MEGABYTES)
+                        f"Downloading {url}... ({counter / megabytes}6.2f/{length / megabytes}6.2f MB)"
                     )
                     progress_bar.progress(min(counter / length, 1.0))
-    # Finally, we remove these visual elements by calling .empty().
+    # remove visual elements by calling .empty().
     finally:
         if weights_warning is not None:
             weights_warning.empty()

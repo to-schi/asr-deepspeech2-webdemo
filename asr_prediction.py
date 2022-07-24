@@ -1,3 +1,11 @@
+<<<<<<< HEAD
+=======
+"""
+Prediction Service for Deepspeech2-Keras
+"""
+# pylint: disable=C0301
+import logging
+>>>>>>> 255eb2db8f1251f554343f171384cc57f3f8380d
 import os
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
@@ -7,6 +15,11 @@ import keras
 import streamlit as st
 import tensorflow as tf
 import tensorflow_io as tfio
+<<<<<<< HEAD
+=======
+from tensorflow.keras import backend as k
+from tensorflow.keras.layers import StringLookup  # type: ignore
+>>>>>>> 255eb2db8f1251f554343f171384cc57f3f8380d
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.ERROR)
@@ -45,9 +58,13 @@ class _Prediction_Service:
     def decode_predictions(self, pred):
         input_len = tf.ones(pred.shape[0]) * pred.shape[1]
 
+<<<<<<< HEAD
         result = keras.backend.ctc_decode(pred, input_length=input_len, greedy=True)[0][
             0
         ]
+=======
+        result = k.ctc_decode(pred, input_length=input_len, greedy=True)[0][0]
+>>>>>>> 255eb2db8f1251f554343f171384cc57f3f8380d
 
         result = tf.strings.reduce_join(num_to_char(result)).numpy().decode("utf-8")
         return result
@@ -81,11 +98,15 @@ def ctc_loss(y_true, y_pred):
         keras.backend.ctc_label_dense_to_sparse(y_true, label_length), tf.int32
     )
     y_pred = tf.math.log(
+<<<<<<< HEAD
         tf.compat.v1.transpose(y_pred, perm=[1, 0, 2]) + keras.backend.epsilon()
+=======
+        tf.transpose(y_pred, perm=[1, 0, 2]) + tf.keras.backend.epsilon()
+>>>>>>> 255eb2db8f1251f554343f171384cc57f3f8380d
     )
 
     loss = tf.expand_dims(
-        tf.compat.v1.nn.ctc_loss_v2(
+        tf.nn.ctc_loss(
             labels=sparse_labels,
             logits=y_pred,
             label_length=label_length,
