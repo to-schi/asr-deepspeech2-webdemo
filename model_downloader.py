@@ -1,17 +1,20 @@
-import streamlit as st
 import urllib.request
 from pathlib import Path
 
-'''file-download based on
-https://github.com/streamlit/demo-self-driving/blob/230245391f2dda0cb464008195a470751c01770b/streamlit_app.py#L48'''
+import streamlit as st
+
+"""file-download based on
+https://github.com/streamlit/demo-self-driving/blob/230245391f2dda0cb464008195a470751c01770b/streamlit_app.py#L48"""
+
+
 def download_file(url, download_to: Path, expected_size=None):
     # Don't download the file twice.
     # (If possible, verify the download using the file length.)
     if download_to.exists():
         if expected_size:
             if download_to.stat().st_size == expected_size:
-                st.session_state['model'] = True
-                #st.write("Model found.")
+                st.session_state["model"] = True
+                # st.write("Model found.")
                 return
         else:
             st.info(f"{url} is already downloaded.")
@@ -29,7 +32,7 @@ def download_file(url, download_to: Path, expected_size=None):
             with urllib.request.urlopen(url) as response:
                 length = int(response.info()["Content-Length"])
                 counter = 0.0
-                MEGABYTES = 2.0 ** 20.0
+                MEGABYTES = 2.0**20.0
                 while True:
                     data = response.read(8192)
                     if not data:
@@ -49,4 +52,4 @@ def download_file(url, download_to: Path, expected_size=None):
             weights_warning.empty()
         if progress_bar is not None:
             progress_bar.empty()
-        st.session_state['model'] = True
+        st.session_state["model"] = True
