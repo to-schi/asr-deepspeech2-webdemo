@@ -3,4 +3,5 @@ tensorflow==2.8.0
 tensorflow-io==0.25
 pydub
 streamlit_webrtc
+pypi-kenlm
 pyctcdecode 
