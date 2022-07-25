@@ -1,6 +1,8 @@
 """
 Streamlit application for the demo of ASR Deepspeech2-Keras
 """
+!pip install "./kenlm/pypi-kenlm-0.1.20210121.tar.gz"
+
 import logging
 import logging.handlers
 import os
