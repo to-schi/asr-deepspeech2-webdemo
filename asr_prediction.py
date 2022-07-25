@@ -1,19 +1,28 @@
 """
-Prediction Service for Deepspeech2-Keras
+Prediction Service for ASR-Deepspeech2-Tensorflow
 """
+import io
 import logging
 import os
+from contextlib import redirect_stderr, redirect_stdout
+from pathlib import Path
 
+import kenlm
 import keras
+import numpy as np
 import streamlit as st
 import tensorflow as tf
 import tensorflow_io as tfio
+from pyctcdecode import build_ctcdecoder
+
+import noisereduce as nr
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.ERROR)
-
-MODEL_PATH = "./model/DeepSpeech_RNN.h5"
+HERE = Path(__file__).parent
+MODEL_LOCAL_PATH = HERE / "model/deepspeech2-tf_model.h5"
+LM_MODEL_LOCAL_PATH = HERE / "model/kenlm_librispeech.scorer"
 characters = list("abcdefghijklmnopqrstuvwxyz' ")
 char_to_int = keras.layers.StringLookup(vocabulary=characters, oov_token="")
 int_to_char = keras.layers.StringLookup(
@@ -34,6 +43,7 @@ class _Prediction_Service:
         audio = tfio.audio.decode_wav(audio, dtype=tf.int16)
         audio = audio / tf.reduce_max(audio)
         audio = tf.squeeze(audio, axis=-1)
+
         audio = tf.cast(audio, tf.float32)
         spectrogram = tfio.audio.spectrogram(
             audio, nfft=n_fft, window=window, stride=stride
@@ -44,9 +54,7 @@ class _Prediction_Service:
         dbscale_mel_spectrogram = tfio.audio.dbscale(mel_spectrogram, top_db=80)
         return dbscale_mel_spectrogram
 
-    def ctc_decoding(
-        self, y_pred, input_length, greedy=True, beam_width=100, top_paths=1
-    ):
+    def ctc_decoding(self, y_pred, input_length):
         """
         Based on: https://github.com/keras-team/keras/blob/master/keras/backend.py
         """
@@ -57,19 +65,12 @@ class _Prediction_Service:
         )
         input_length = tf.cast(input_length, tf.int32)
 
-        if greedy:
-            (decoded, log_prob) = tf.nn.ctc_greedy_decoder(
-                inputs=y_pred,
-                sequence_length=input_length,
-                blank_index=0,  # Default: num_classes - 1 , here="oov_token"=0
-            )
-        else:
-            (decoded, log_prob) = tf.nn.ctc_beam_search_decoder(
-                inputs=y_pred,
-                sequence_length=input_length,
-                beam_width=beam_width,
-                top_paths=top_paths,
-            )
+        (decoded, log_prob) = tf.nn.ctc_greedy_decoder(
+            inputs=y_pred,
+            sequence_length=input_length,
+            blank_index=0,  # Default: num_classes - 1 , here="oov_token"=0
+        )
+
         decoded_dense = []
         for st in decoded:
             st = tf.SparseTensor(st.indices, st.values, (num_samples, num_steps))
@@ -78,29 +79,59 @@ class _Prediction_Service:
             )  # backend.py: default_value=-1
         return (decoded_dense, log_prob)
 
+    def ctc_decoding_lm(self, logits, labels):
+        """
+        ctc_decoder with use of Kenlm-model build on
+        http://www.openslr.org/resources/11/librispeech-lm-norm.txt.gz (arpa_order=5, binary_type=trie)
+        stdout redirected for: "Unigrams not provided and cannot be automatically determined from LM file..."
+        """
+        f = io.StringIO()
+        with redirect_stdout(f), redirect_stderr(f):
+            logits = np.squeeze(logits)
+            decoder = build_ctcdecoder(
+                labels,
+                # kenlm_model_path=DATA_PATH+"kenlm-model/kenlm.scorer", # either .arpa or .bin file
+                kenlm_model_path=str(LM_MODEL_LOCAL_PATH),
+                alpha=0.7,  # tuned on a val set 0.7 , 0.931289039105002 0.5  LM Weight: 0.75
+                beta=1.0,  # tuned on a val set 1.0, 1.1834137581510284 1.0 # LM Usage Reward: 1.85
+            )
+            text = decoder.decode(logits)
+            logging.info(f.getvalue())
+        return text
+
     def decode_predictions(self, pred):
         """
         Takes prediction-logits and decodes to text.
         """
         input_len = tf.ones(pred.shape[0]) * pred.shape[1]
-
-        result = self.ctc_decoding(pred, input_len, greedy=True)[0][0]
-
+        # original: result = keras.backend.ctc_decode(pred, input_length=input_len, greedy=True)[0][0]
+        result = self.ctc_decoding(pred, input_len)[0][0]
         result = tf.strings.reduce_join(int_to_char(result)).numpy().decode("utf-8")
         return result
 
-    def make_prediction(self, file):
+    def decode_predictions_lm(self, pred):
+        """
+        Takes prediction-logits and decodes to text.
+        """
+        result = self.ctc_decoding_lm(pred, char_to_int.get_vocabulary())
+        return result
+
+    def make_prediction(self, file, lm: bool):
         """
         Main prediction function
         """
-        if self.model == None:
+        if self.model is None:
             self.model = keras.models.load_model(
-                MODEL_PATH, custom_objects={"ctc_loss": ctc_loss}
+                str(MODEL_LOCAL_PATH), custom_objects={"ctc_loss": ctc_loss}
             )
         recording = self.encode_audio(file, 16000)
         recording = tf.expand_dims(recording, axis=0)
         output = self.model.predict(recording)
-        output = self.decode_predictions(output)
+        if lm is True:
+            output = self.decode_predictions_lm(output)
+        else:
+            output = self.decode_predictions(output)
+
         return output
 
 
@@ -144,7 +175,7 @@ def Prediction_Service():
     if _Prediction_Service._instance is None:
         _Prediction_Service._instance = _Prediction_Service()
         _Prediction_Service.model = keras.models.load_model(
-            MODEL_PATH, custom_objects={"ctc_loss": ctc_loss}
+            str(MODEL_LOCAL_PATH), custom_objects={"ctc_loss": ctc_loss}
         )
     return _Prediction_Service._instance
 

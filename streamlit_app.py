@@ -6,8 +6,12 @@ import logging.handlers
 import os
 from pathlib import Path
 
+import librosa
+
+# from pydub import AudioSegment
+import noisereduce as nr
+import soundfile as sf
 import streamlit as st
-from pydub import AudioSegment
 
 from asr_prediction import Prediction_Service
 from model_downloader import download_file
@@ -24,7 +28,11 @@ HERE = Path(__file__).parent
 MODEL_URL = (
     "https://www.dropbox.com/s/ofbc4jjhkw0wdue/RNN_ctc2_6000_29out_vl23.49.h5?raw=1"
 )
-MODEL_LOCAL_PATH = HERE / "model/DeepSpeech2_RNN.h5"
+LM_MODEL_URL = (
+    "https://www.dropbox.com/s/67bwmvb5ito961l/kenlm_librispeech.scorer?raw=1"
+)
+MODEL_LOCAL_PATH = HERE / "model/deepspeech2-tf_model.h5"
+LM_MODEL_LOCAL_PATH = HERE / "model/kenlm_librispeech.scorer"
 RECORDED = HERE / "recordings/temp.wav"
 UPLOADED = HERE / "recordings/uploaded.wav"
 RESAMPLED = HERE / "recordings/resampled.wav"
@@ -39,10 +47,15 @@ st.set_page_config(page_title="Speech Recognition Demo", page_icon=":robot_face:
 st.title("Speech Recognition Demo")
 st.markdown(
     """
-This demo app is presenting an end-to-end speech recognition engine similar to [DeepSpeech2](https://arxiv.org/abs/1512.02595).
-It was implemented in Tensorflow and trained on the [LibriSpeech](https://www.openslr.org/12) dataset with 960 hours of English speech.
-The word-error-rate on the test data is currently at 11%. A good microphone is recommended.\n
-More information can be found [here](https://github.com/to-schi/ASR-Deepspeech2-Tensorflow).
+This demo app is presenting an end-to-end speech recognition engine similar to 
+[DeepSpeech2](https://arxiv.org/abs/1512.02595).
+It was implemented in Tensorflow and trained on the [LibriSpeech](https://www.openslr.org/12) 
+dataset with 960 hours of English speech. The word-error-rate on the clean test data is 10%.\n
+With the use of the **language model** the performance can significantly be improved. 
+It works as a scorer for letter-sequence probabilities in the decoder. 
+You can switch off the language model to see the transcriptions generated using only the 
+information of the **accustic model**. A good microphone is recommended.\n
+More information can be found [here](https://github.com/to-schi/ASR-Deepspeech2-Tensorflow).\n
 """
 )
 # color "st.buttons" in main page light blue:
@@ -77,6 +90,12 @@ def read_audio(file):
     return audio_bytes
 
 
+def denoise_audio(signal, sr=16000, threshold=0.1):
+    return nr.reduce_noise(
+        y=signal, sr=sr, n_std_thresh_stationary=threshold, stationary=True
+    )
+
+
 def main():
     """
     Main function for defining streamlit page-behaviour
@@ -86,6 +105,7 @@ def main():
         MODEL_URL, MODEL_LOCAL_PATH, expected_size=112496464
     )  # expected_size= 337407816 112500560 112496464
 
+    download_file(LM_MODEL_URL, LM_MODEL_LOCAL_PATH, expected_size=953363776)
     # set 3 pages to select in sidebar:
     page = st.sidebar.selectbox(
         "Choose an option:", ["Record speech", "Open wav-file", "Examples"]
@@ -96,42 +116,52 @@ def main():
         record_to_file(RECORDED)
 
         if RECORDED.exists() is True:
-            st.write("Recording found.")
+            recording_info = st.info("Recording found.")
             st.audio(read_audio(RECORDED), format="audio/wav")
 
+            lm_r = st.checkbox("Use language model", value=False, key=4)
             predict_rec = st.button("Transcribe recording")
             if predict_rec:
-                prediction = ps.make_prediction(str(RECORDED))
-                st.write(f"**Prediction:  '{prediction}'**")
+                prediction = ps.make_prediction(str(RECORDED), lm_r)
+                recording_info.info(f"**Prediction:  '{prediction}'**")
                 st.download_button("Save recorded file", read_audio(RECORDED), "audio")
 
             # Creates a button to delete the current recorded file from the server.
             delete_rec = st.button("Delete recording")
             if delete_rec:
                 os.remove(RECORDED)
+                recording_info.info("Recording deleted.")
 
     elif page == "Open wav-file":
         st.header("Open wav-file")
         # create upload button:
         uploaded_file = st.file_uploader("")
+        lm_o = st.checkbox("Use language model", value=False, key=5)
 
         if uploaded_file is not None:
             # Uploaded file is saved to the server as "uploaded.wav":
             bytes_data = uploaded_file.getvalue()
             with open(str(UPLOADED), "wb") as f:
                 f.write(bytes_data)
-
             # resample to 16000Hz and reduce channels to 1:
-            audio_data = AudioSegment.from_wav(str(UPLOADED))
-            audio_data = audio_data.set_channels(1)
-            audio_data = audio_data.set_frame_rate(SAMPLERATE)
-            audio_data.export(str(RESAMPLED), format="wav")
-
+            # ! wave-module produced a "clicking"-noise, switched to librosa
+            audio_data, sr = librosa.load(str(UPLOADED))
+            audio_data = librosa.to_mono(audio_data)
+            audio_data = librosa.resample(audio_data, orig_sr=sr, target_sr=SAMPLERATE)
+            audio_data = denoise_audio(audio_data, SAMPLERATE)
+            sf.write(str(RESAMPLED), audio_data, samplerate=SAMPLERATE)
             # predict with PredictionService
             st.audio(read_audio(RESAMPLED), format="audio/wav")
-            st.write("Transcribing...")
-            prediction = ps.make_prediction(str(RESAMPLED))
-            st.write(f"**Prediction:  '{prediction}'**")
+            transcribing = st.info("Transcribing...")
+            prediction = ps.make_prediction(str(RESAMPLED), lm_o)
+            transcribing.info(f"**Prediction:  '{prediction}'**")
+
+        # Alternative resampling (without noisereduce):
+        #     # resample to 16000Hz and reduce channels to 1:
+        #     audio_data = AudioSegment.from_wav(str(UPLOADED))
+        #     audio_data = audio_data.set_channels(1)
+        #     audio_data = audio_data.set_frame_rate(SAMPLERATE)
+        #     audio_data.export(str(RESAMPLED), format="wav")
 
     else:
         # streamlit container-structure
@@ -140,6 +170,7 @@ def main():
         second = st.container()
         third = st.container()
 
+        lm_e = first.checkbox("Use language model", value=True, key=6)
         first.audio(read_audio(EXAMPLE_1), format="audio/wav")
         first.write("Text: 'destroy him my robots' (Impossible Mission)")
         example1 = first.button("Transcribe", key=1)
@@ -159,11 +190,17 @@ def main():
         example3 = third.button("Transcribe", key=3)
 
         if example1:
-            first.write(f"**Prediction:  '{ps.make_prediction(str(EXAMPLE_1))}'**")
+            first.write(
+                f"**Prediction:  '{ps.make_prediction(str(EXAMPLE_1), lm_e)}'**"
+            )
         if example2:
-            second.write(f"**Prediction:  '{ps.make_prediction(str(EXAMPLE_2))}'**")
+            second.write(
+                f"**Prediction:  '{ps.make_prediction(str(EXAMPLE_2), lm_e)}'**"
+            )
         if example3:
-            third.write(f"**Prediction:  '{ps.make_prediction(str(EXAMPLE_3))}'**")
+            third.write(
+                f"**Prediction:  '{ps.make_prediction(str(EXAMPLE_3), lm_e)}'**"
+            )
 
 
 #########################################################################

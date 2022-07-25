@@ -4,7 +4,7 @@ headless = true
 
 [theme]
 # Primary accent color for interactive elements.
-primaryColor = "#d0fcff"
+primaryColor = "#8E18CA" #"#d0fcff"
 
 # Background color for the main content area.
 backgroundColor = "#00172B"
