@@ -6,12 +6,8 @@ import logging.handlers
 import os
 from pathlib import Path
 
-import librosa
-
-# from pydub import AudioSegment
-import noisereduce as nr
-import soundfile as sf
 import streamlit as st
+from pydub import AudioSegment
 
 from asr_prediction import Prediction_Service
 from model_downloader import download_file
@@ -90,12 +86,6 @@ def read_audio(file):
     return audio_bytes
 
 
-def denoise_audio(signal, sr=16000, threshold=0.1):
-    return nr.reduce_noise(
-        y=signal, sr=sr, n_std_thresh_stationary=threshold, stationary=True
-    )
-
-
 def main():
     """
     Main function for defining streamlit page-behaviour
@@ -143,25 +133,18 @@ def main():
             bytes_data = uploaded_file.getvalue()
             with open(str(UPLOADED), "wb") as f:
                 f.write(bytes_data)
+
             # resample to 16000Hz and reduce channels to 1:
-            # ! wave-module produced a "clicking"-noise, switched to librosa
-            audio_data, sr = librosa.load(str(UPLOADED))
-            audio_data = librosa.to_mono(audio_data)
-            audio_data = librosa.resample(audio_data, orig_sr=sr, target_sr=SAMPLERATE)
-            audio_data = denoise_audio(audio_data, SAMPLERATE)
-            sf.write(str(RESAMPLED), audio_data, samplerate=SAMPLERATE)
+            audio_data = AudioSegment.from_wav(str(UPLOADED))
+            audio_data = audio_data.set_channels(1)
+            audio_data = audio_data.set_frame_rate(SAMPLERATE)
+            audio_data.export(str(RESAMPLED), format="wav")
+
             # predict with PredictionService
             st.audio(read_audio(RESAMPLED), format="audio/wav")
             transcribing = st.info("Transcribing...")
             prediction = ps.make_prediction(str(RESAMPLED), lm_o)
             transcribing.info(f"**Prediction:  '{prediction}'**")
-
-        # Alternative resampling (without noisereduce):
-        #     # resample to 16000Hz and reduce channels to 1:
-        #     audio_data = AudioSegment.from_wav(str(UPLOADED))
-        #     audio_data = audio_data.set_channels(1)
-        #     audio_data = audio_data.set_frame_rate(SAMPLERATE)
-        #     audio_data.export(str(RESAMPLED), format="wav")
 
     else:
         # streamlit container-structure
