@@ -7,7 +7,6 @@ import os
 from contextlib import redirect_stderr, redirect_stdout
 from pathlib import Path
 
-import kenlm
 import keras
 import numpy as np
 import streamlit as st
@@ -15,7 +14,7 @@ import tensorflow as tf
 import tensorflow_io as tfio
 from pyctcdecode import build_ctcdecoder
 
-import noisereduce as nr
+import kenlm
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 logger = logging.getLogger(__name__)
