@@ -1,1 +1,1 @@
-web: sh streamlit run streamlit_app.py
+web: sh release.sh && streamlit run streamlit_app.py
