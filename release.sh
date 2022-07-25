@@ -1,2 +1,2 @@
 #!/bin/bash
-pip install ./kenlm/kenlm-0.0.0-cp39-cp39-linux_x86_64.whl
+python3 -m pip install "./kenlm/pypi-kenlm-0.1.20210121.tar.gz"
