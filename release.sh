@@ -1,3 +1,2 @@
 #!/bin/bash
-
-pip install https://github.com/kpu/kenlm/archive/master.zip
+pip install ./kenlm/kenlm-0.0.0-cp39-cp39-linux_x86_64.whl
