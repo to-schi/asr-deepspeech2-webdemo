@@ -5,4 +5,3 @@ pydub==0.25.1
 streamlit_webrtc==0.42.0
 librosa==0.9.2
 noisereduce==2.0.1
-kenlm
