@@ -84,3 +84,4 @@ def record_to_file(FILENAME):
         audio_buffer.export(str(FILENAME), format="wav")
         # Reset
         st.session_state["audio_buffer"] = pydub.AudioSegment.empty()
+        status_indicator.empty()
