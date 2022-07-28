@@ -7,7 +7,6 @@ import os
 from contextlib import redirect_stderr, redirect_stdout
 from pathlib import Path
 
-import keras
 import numpy as np
 import streamlit as st
 import tensorflow as tf
@@ -21,8 +20,8 @@ HERE = Path(__file__).parent
 MODEL_LOCAL_PATH = HERE / "model/deepspeech2-tf_model.h5"
 LM_MODEL_LOCAL_PATH = HERE / "model/kenlm_librispeech.scorer"
 characters = list("abcdefghijklmnopqrstuvwxyz' ")
-char_to_int = keras.layers.StringLookup(vocabulary=characters, oov_token="")
-int_to_char = keras.layers.StringLookup(
+char_to_int = tf.keras.layers.StringLookup(vocabulary=characters, oov_token="")
+int_to_char = tf.keras.layers.StringLookup(
     vocabulary=char_to_int.get_vocabulary(), oov_token="", invert=True
 )
 
@@ -56,10 +55,10 @@ class _Prediction_Service:
         """
         Based on: https://github.com/keras-team/keras/blob/master/keras/backend.py
         """
-        input_shape = keras.backend.shape(y_pred)
+        input_shape = tf.keras.backend.shape(y_pred)
         num_samples, num_steps = input_shape[0], input_shape[1]
         y_pred = tf.math.log(
-            tf.transpose(y_pred, perm=[1, 0, 2]) + keras.backend.epsilon()
+            tf.transpose(y_pred, perm=[1, 0, 2]) + tf.keras.backend.epsilon()
         )
         input_length = tf.cast(input_length, tf.int32)
 
@@ -157,9 +156,11 @@ def ctc_loss(y_true, y_pred):
     label_length = tf.cast(tf.squeeze(label_length, axis=-1), tf.int32)
 
     sparse_labels = tf.cast(
-        keras.backend.ctc_label_dense_to_sparse(y_true, label_length), tf.int32
+        tf.keras.backend.ctc_label_dense_to_sparse(y_true, label_length), tf.int32
     )
-    y_pred = tf.math.log(tf.transpose(y_pred, perm=[1, 0, 2]) + keras.backend.epsilon())
+    y_pred = tf.math.log(
+        tf.transpose(y_pred, perm=[1, 0, 2]) + tf.keras.backend.epsilon()
+    )
 
     loss = tf.expand_dims(
         tf.nn.ctc_loss(
