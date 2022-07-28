@@ -72,11 +72,13 @@ class _Prediction_Service:
         )
 
         decoded_dense = []
-        for st in decoded:
-            st = tf.SparseTensor(st.indices, st.values, (num_samples, num_steps))
+        for sp_tensor in decoded:
+            sp_tensor = tf.SparseTensor(
+                sp_tensor.indices, sp_tensor.values, (num_samples, num_steps)
+            )
             decoded_dense.append(
-                tf.sparse.to_dense(sp_input=st, default_value=None)
-            )  # backend.py: default_value=-1
+                tf.sparse.to_dense(sp_input=sp_tensor, default_value=None)
+            )
         return (decoded_dense, log_prob)
 
     def ctc_decoding_lm(self, logits, labels):
@@ -90,10 +92,9 @@ class _Prediction_Service:
             logits = np.squeeze(logits)
             decoder = build_ctcdecoder(
                 labels,
-                # kenlm_model_path=DATA_PATH+"kenlm-model/kenlm.scorer", # either .arpa or .bin file
                 kenlm_model_path=str(LM_MODEL_LOCAL_PATH),
-                alpha=0.7,  # tuned on a val set 0.7 , 0.931289039105002 0.5  LM Weight: 0.75
-                beta=1.0,  # tuned on a val set 1.0, 1.1834137581510284 1.0 # LM Usage Reward: 1.85
+                alpha=0.9,
+                beta=1.2,
             )
             text = decoder.decode(logits)
             logging.info(f.getvalue())
