@@ -14,8 +14,6 @@ import tensorflow as tf
 import tensorflow_io as tfio
 from pyctcdecode import build_ctcdecoder
 
-import kenlm
-
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.ERROR)
@@ -105,7 +103,6 @@ class _Prediction_Service:
         Takes prediction-logits and decodes to text.
         """
         input_len = tf.ones(pred.shape[0]) * pred.shape[1]
-        # original: result = keras.backend.ctc_decode(pred, input_length=input_len, greedy=True)[0][0]
         result = self.ctc_decoding(pred, input_len)[0][0]
         result = tf.strings.reduce_join(int_to_char(result)).numpy().decode("utf-8")
         return result
@@ -119,7 +116,12 @@ class _Prediction_Service:
 
     def make_prediction(self, file, lm: bool):
         """
-        Main prediction function
+        Main prediction function.
+        Args:
+            file = filepath of input
+            lm = bool for use of language model
+        Returns:
+            prediction as str
         """
         if self.model is None:
             self.model = keras.models.load_model(
@@ -141,6 +143,7 @@ def ctc_loss(y_true, y_pred):
     """
     Loss function based on:
     https://github.com/keras-team/keras/blob/253dc4604479b832dd254d0d348c0b3e7e53fe0f/keras/backend.py
+    Adapted to 'blank_index = 0'
     """
     batch_len = tf.cast(tf.shape(y_true)[0], dtype=tf.int64)
 
