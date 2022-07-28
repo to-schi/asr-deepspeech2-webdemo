@@ -91,12 +91,6 @@ def main():
     """
     Main function for defining streamlit page-behaviour
     """
-    # Download model-file if not existing and set session_state['model'] = True
-    download_file(
-        MODEL_URL, MODEL_LOCAL_PATH, expected_size=112496464
-    )  # expected_size= 337407816 112500560 112496464
-
-    download_file(LM_MODEL_URL, LM_MODEL_LOCAL_PATH, expected_size=953363776)
     # set 3 pages to select in sidebar:
     page = st.sidebar.selectbox(
         "Choose an option:", ["Record speech", "Open wav-file", "Examples"]
@@ -132,8 +126,8 @@ def main():
         if uploaded_file is not None:
             # Uploaded file is saved to the server as "uploaded.wav":
             bytes_data = uploaded_file.getvalue()
-            with open(str(UPLOADED), "wb") as f:
-                f.write(bytes_data)
+            with open(str(UPLOADED), "wb") as file:
+                file.write(bytes_data)
 
             # resample to 16000Hz and reduce channels to 1:
             audio_data = AudioSegment.from_wav(str(UPLOADED))
@@ -206,4 +200,12 @@ if __name__ == "__main__":
 
     if st.session_state["model"] is True:
         ps = Prediction_Service()
+    else:
+        # Download model-file if not existing and set session_state['model'] = True
+        download_file(
+            MODEL_URL, MODEL_LOCAL_PATH, expected_size=112496464
+        )  # expected_size= 337407816 112500560 112496464
+        download_file(LM_MODEL_URL, LM_MODEL_LOCAL_PATH, expected_size=953363776)
+        ps = Prediction_Service()
+
     main()

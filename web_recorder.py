@@ -77,7 +77,7 @@ def record_to_file(FILENAME):
     audio_buffer = st.session_state["audio_buffer"]
 
     if not webrtc_ctx.state.playing and len(audio_buffer) > 0:
-        st.info("Writing wav to disk")
+        status_indicator.write("Writing wav to disk")  # st.info("Writing wav to disk")
         audio_buffer = trim_silence(audio_buffer)
         # resample to 16000sr, 1ch, 16bit
         audio_buffer = audio_buffer.set_frame_rate(16000).set_channels(1)

@@ -53,6 +53,7 @@ class _Prediction_Service:
         dbscale_mel_spectrogram = tfio.audio.dbscale(mel_spectrogram, top_db=80)
         return dbscale_mel_spectrogram
 
+    @tf.function(experimental_relax_shapes=True)
     def ctc_decoding(self, y_pred, input_length):
         """
         Based on: https://github.com/keras-team/keras/blob/master/keras/backend.py
