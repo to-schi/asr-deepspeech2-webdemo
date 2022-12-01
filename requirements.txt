@@ -1,0 +1,7 @@
+streamlit==1.13
+tensorflow-cpu==2.8.2
+tensorflow-io==0.25
+pydub==0.25
+streamlit_webrtc==0.43.4 
+pypi-kenlm
+pyctcdecode==0.4.0
